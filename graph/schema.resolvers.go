@@ -24,7 +24,6 @@ func (r *queryResolver) Todos(ctx context.Context) ([]*model.Todo, error) {
 
 func (r *queryResolver) Sectors(ctx context.Context) ([]*model.Sector, error) {
 	var sectors []*model.Sector
-	// ctx, _ := context.WithTimeout(context.Background(), 30*time.Second)
 	cursor, err := db.Connect().Sectors.Find(context.TODO(), bson.M{})
 	if err != nil {
 		log.Fatal(err)
@@ -36,7 +35,15 @@ func (r *queryResolver) Sectors(ctx context.Context) ([]*model.Sector, error) {
 }
 
 func (r *queryResolver) Companies(ctx context.Context) ([]*model.Company, error) {
-	panic(fmt.Errorf("not implemented"))
+	var companies []*model.Company
+	cursor, err := db.Connect().Companies.Find(context.TODO(), bson.M{})
+	if err != nil {
+		log.Fatal(err)
+	}
+	if err = cursor.All(ctx, &companies); err != nil {
+		log.Fatal(err)
+	}
+	return companies, nil
 }
 
 // Mutation returns generated.MutationResolver implementation.

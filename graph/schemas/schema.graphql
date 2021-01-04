@@ -29,14 +29,6 @@ type Mutation {
   createTodo(input: NewTodo!): Todo!
 }
 
-# type Company {
-#   id: ID!
-#   code: String!
-#   name: String!
-#   sector: String!
-#   exchange: String!
-# }
-
 type Sector {
   id: ID!
   label: String!
@@ -49,5 +41,5 @@ type Company {
   code: String!
   name: String!
   exchange: String!
-  sector: Sector
+  # sector: Sector
 }

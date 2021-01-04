@@ -48,7 +48,6 @@ type ComplexityRoot struct {
 		Exchange func(childComplexity int) int
 		ID       func(childComplexity int) int
 		Name     func(childComplexity int) int
-		Sector   func(childComplexity int) int
 	}
 
 	Mutation struct {
@@ -132,13 +131,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Company.Name(childComplexity), true
-
-	case "Company.sector":
-		if e.complexity.Company.Sector == nil {
-			break
-		}
-
-		return e.complexity.Company.Sector(childComplexity), true
 
 	case "Mutation.createTodo":
 		if e.complexity.Mutation.CreateTodo == nil {
@@ -358,7 +350,7 @@ type Company {
   code: String!
   name: String!
   exchange: String!
-  sector: Sector
+  # sector: Sector
 }
 `, BuiltIn: false},
 }
@@ -574,38 +566,6 @@ func (ec *executionContext) _Company_exchange(ctx context.Context, field graphql
 	res := resTmp.(string)
 	fc.Result = res
 	return ec.marshalNString2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _Company_sector(ctx context.Context, field graphql.CollectedField, obj *model.Company) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "Company",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Sector, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*model.Sector)
-	fc.Result = res
-	return ec.marshalOSector2ᚖgithubᚗcomᚋnamndᚋstockvnᚑgraphqlᚋgraphᚋmodelᚐSector(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_createTodo(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -2324,8 +2284,6 @@ func (ec *executionContext) _Company(ctx context.Context, sel ast.SelectionSet, 
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "sector":
-			out.Values[i] = ec._Company_sector(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}

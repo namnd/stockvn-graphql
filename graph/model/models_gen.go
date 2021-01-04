@@ -3,11 +3,10 @@
 package model
 
 type Company struct {
-	ID       string  `json:"id"`
-	Code     string  `json:"code"`
-	Name     string  `json:"name"`
-	Exchange string  `json:"exchange"`
-	Sector   *Sector `json:"sector"`
+	ID       string `json:"id"`
+	Code     string `json:"code"`
+	Name     string `json:"name"`
+	Exchange string `json:"exchange"`
 }
 
 type NewTodo struct {
