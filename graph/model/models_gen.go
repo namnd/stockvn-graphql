@@ -2,9 +2,24 @@
 
 package model
 
+type Company struct {
+	ID       string  `json:"id"`
+	Code     string  `json:"code"`
+	Name     string  `json:"name"`
+	Exchange string  `json:"exchange"`
+	Sector   *Sector `json:"sector"`
+}
+
 type NewTodo struct {
 	Text   string `json:"text"`
 	UserID string `json:"userId"`
+}
+
+type Sector struct {
+	ID           string    `json:"id"`
+	Label        string    `json:"label"`
+	LabelEnglish *string   `json:"label_english"`
+	Children     []*Sector `json:"children"`
 }
 
 type Todo struct {

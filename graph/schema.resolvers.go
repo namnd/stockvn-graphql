@@ -6,9 +6,12 @@ package graph
 import (
 	"context"
 	"fmt"
+	"log"
 
+	"github.com/namnd/stockvn-graphql/db"
 	"github.com/namnd/stockvn-graphql/graph/generated"
 	"github.com/namnd/stockvn-graphql/graph/model"
+	"go.mongodb.org/mongo-driver/bson"
 )
 
 func (r *mutationResolver) CreateTodo(ctx context.Context, input model.NewTodo) (*model.Todo, error) {
@@ -16,6 +19,23 @@ func (r *mutationResolver) CreateTodo(ctx context.Context, input model.NewTodo) 
 }
 
 func (r *queryResolver) Todos(ctx context.Context) ([]*model.Todo, error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
+func (r *queryResolver) Sectors(ctx context.Context) ([]*model.Sector, error) {
+	var sectors []*model.Sector
+	// ctx, _ := context.WithTimeout(context.Background(), 30*time.Second)
+	cursor, err := db.Connect().Sectors.Find(context.TODO(), bson.M{})
+	if err != nil {
+		log.Fatal(err)
+	}
+	if err = cursor.All(ctx, &sectors); err != nil {
+		log.Fatal(err)
+	}
+	return sectors, nil
+}
+
+func (r *queryResolver) Companies(ctx context.Context) ([]*model.Company, error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
