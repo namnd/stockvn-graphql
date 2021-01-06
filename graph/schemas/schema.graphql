@@ -14,10 +14,14 @@ type User {
   name: String!
 }
 
+input CompanySearchParams {
+  exchange: String
+  sectorIds: [String]
+}
 type Query {
   todos: [Todo!]!
-  sectors: [Sector!]!
-  companies: [Company!]!
+  sectors(exchange: String): [Sector!]!
+  companies(searchParams: CompanySearchParams): [Company!]!
 }
 
 input NewTodo {
@@ -33,7 +37,7 @@ type Sector {
   id: ID!
   label: String!
   label_english: String
-  children: [Sector]
+  exchange: String!
 }
 
 type Company {
@@ -41,5 +45,5 @@ type Company {
   code: String!
   name: String!
   exchange: String!
-  # sector: Sector
+  sectorId: String!
 }

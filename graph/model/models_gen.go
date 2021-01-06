@@ -7,6 +7,12 @@ type Company struct {
 	Code     string `json:"code"`
 	Name     string `json:"name"`
 	Exchange string `json:"exchange"`
+	SectorID string `json:"sectorId"`
+}
+
+type CompanySearchParams struct {
+	Exchange  *string   `json:"exchange"`
+	SectorIds []*string `json:"sectorIds"`
 }
 
 type NewTodo struct {
@@ -15,10 +21,10 @@ type NewTodo struct {
 }
 
 type Sector struct {
-	ID           string    `json:"id"`
-	Label        string    `json:"label"`
-	LabelEnglish *string   `json:"label_english"`
-	Children     []*Sector `json:"children"`
+	ID           string  `json:"id"`
+	Label        string  `json:"label"`
+	LabelEnglish *string `json:"label_english"`
+	Exchange     string  `json:"exchange"`
 }
 
 type Todo struct {

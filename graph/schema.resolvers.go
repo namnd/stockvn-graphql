@@ -22,9 +22,13 @@ func (r *queryResolver) Todos(ctx context.Context) ([]*model.Todo, error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
-func (r *queryResolver) Sectors(ctx context.Context) ([]*model.Sector, error) {
+func (r *queryResolver) Sectors(ctx context.Context, exchange *string) ([]*model.Sector, error) {
 	var sectors []*model.Sector
-	cursor, err := db.Connect().Sectors.Find(context.TODO(), bson.M{})
+	filter := bson.M{}
+	if exchange != nil && *exchange != "all" {
+		filter = bson.M{"exchange": *exchange}
+	}
+	cursor, err := db.Connect().Sectors.Find(context.TODO(), filter)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -34,9 +38,21 @@ func (r *queryResolver) Sectors(ctx context.Context) ([]*model.Sector, error) {
 	return sectors, nil
 }
 
-func (r *queryResolver) Companies(ctx context.Context) ([]*model.Company, error) {
+func (r *queryResolver) Companies(ctx context.Context, searchParams *model.CompanySearchParams) ([]*model.Company, error) {
 	var companies []*model.Company
-	cursor, err := db.Connect().Companies.Find(context.TODO(), bson.M{})
+	filter := bson.M{}
+	if exchange := searchParams.Exchange; exchange != nil && *exchange != "all" {
+		filter = bson.M{"exchange": *exchange}
+	}
+	sectorQuery := []bson.M{}
+	if sectorIds := searchParams.SectorIds; sectorIds != nil && len(sectorIds) > 0 {
+		ids := []string{}
+		for _, sectorId := range sectorIds {
+			ids = append(ids, *sectorId)
+		}
+		filter["$and"] = append(sectorQuery, bson.M{"sector_id": bson.M{"$in": ids}})
+	}
+	cursor, err := db.Connect().Companies.Find(context.TODO(), filter)
 	if err != nil {
 		log.Fatal(err)
 	}
