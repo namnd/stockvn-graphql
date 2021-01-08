@@ -17,20 +17,11 @@ type Trade struct {
 	Date       string  `json:"ReportDate"`
 }
 
-func GetTrades(searchParams *model.TradeSearchParams) ([]*model.Trade, error) {
+func GetTrades(code string, from time.Time, to time.Time) ([]*model.Trade, error) {
 	var trades []*model.Trade
 
-	layout := "2006-02-01"
 	format := "01.02.2006"
-	from, err := time.Parse(layout, searchParams.From)
-	if err != nil {
-		return nil, err
-	}
-	to, err := time.Parse(layout, searchParams.To)
-	if err != nil {
-		return nil, err
-	}
-	url := fmt.Sprintf("https://www.hsx.vn/Modules/Rsde/Report/GetTradingInfo?symbol=%s&dateFrom=%s&dateTo=%s", searchParams.Code, from.Format(format), to.Format(format))
+	url := fmt.Sprintf("https://www.hsx.vn/Modules/Rsde/Report/GetTradingInfo?symbol=%s&dateFrom=%s&dateTo=%s", code, from.Format(format), to.Format(format))
 
 	response, err := http.Get(url)
 
@@ -52,6 +43,7 @@ func GetTrades(searchParams *model.TradeSearchParams) ([]*model.Trade, error) {
 		ds := trade.Date
 		ts, _ := strconv.Atoi(ds[6 : len(ds)-2])
 		trades = append(trades, &model.Trade{
+			Code:       code,
 			ClosePrice: int(trade.ClosePrice),
 			Volume:     int(trade.Volume),
 			Timestamp:  ts,

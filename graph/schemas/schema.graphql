@@ -1,38 +1,13 @@
-# GraphQL schema example
-#
-# https://gqlgen.com/getting-started/
-
-type Todo {
-  id: ID!
-  text: String!
-  done: Boolean!
-  user: User!
-}
-
-type User {
-  id: ID!
-  name: String!
-}
-
-input CompanySearchParams {
-  exchange: String
-  sectorIds: [String]
-}
-
-input NewTodo {
-  text: String!
-  userId: String!
-}
-
-type Mutation {
-  createTodo(input: NewTodo!): Todo!
-}
-
 type Sector {
   id: ID!
   label: String!
   label_english: String
   exchange: String!
+}
+
+input CompanySearchParams {
+  exchange: String
+  sectorIds: [String]
 }
 
 type Company {
@@ -44,23 +19,15 @@ type Company {
 }
 
 type Trade {
+  code: String!
   closePrice: Int!
   volume: Int!
   timestamp: Int!
 }
 
-scalar Date
-
-input TradeSearchParams {
-  code: String!
-  from: Date!
-  to: Date!
-}
-
 type Query {
-  todos: [Todo!]!
   sectors(exchange: String): [Sector!]!
   companies(searchParams: CompanySearchParams): [Company!]!
   company(exchange: String!, code: String!): Company!
-  trades(searchParams: TradeSearchParams): [Trade!]!
+  trades(code: String!): [Trade!]!
 }

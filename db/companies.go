@@ -1,8 +1,6 @@
 package db
 
 import (
-	"fmt"
-
 	"github.com/namnd/stockvn-graphql/graph/model"
 	"go.mongodb.org/mongo-driver/bson"
 )
@@ -37,7 +35,6 @@ func FindCompanies(searchParams *model.CompanySearchParams) ([]*model.Company, e
 
 func FindCompany(exchange string, code string) (company *model.Company, err error) {
 	filter := bson.M{"exchange": exchange, "code": code}
-	fmt.Println(exchange, code)
 	db := Connect()
 	err = db.Companies.FindOne(db.Ctx, filter).Decode(&company)
 	return

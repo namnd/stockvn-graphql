@@ -5,21 +5,13 @@ package graph
 
 import (
 	"context"
-	"fmt"
+	"time"
 
 	"github.com/namnd/stockvn-graphql/db"
 	"github.com/namnd/stockvn-graphql/graph/generated"
 	"github.com/namnd/stockvn-graphql/graph/model"
 	"github.com/namnd/stockvn-graphql/scraper"
 )
-
-func (r *mutationResolver) CreateTodo(ctx context.Context, input model.NewTodo) (*model.Todo, error) {
-	panic(fmt.Errorf("not implemented"))
-}
-
-func (r *queryResolver) Todos(ctx context.Context) ([]*model.Todo, error) {
-	panic(fmt.Errorf("not implemented"))
-}
 
 func (r *queryResolver) Sectors(ctx context.Context, exchange *string) ([]*model.Sector, error) {
 	return db.FindSectors(exchange)
@@ -33,36 +25,40 @@ func (r *queryResolver) Company(ctx context.Context, exchange string, code strin
 	return db.FindCompany(exchange, code)
 }
 
-func (r *queryResolver) Trades(ctx context.Context, searchParams *model.TradeSearchParams) ([]*model.Trade, error) {
-	// First crawl some data
-	var trades []*model.Trade
-	trades, err := scraper.GetTrades(searchParams)
-	fmt.Printf("Crawl %d trades", len(trades))
+func (r *queryResolver) Trades(ctx context.Context, code string) ([]*model.Trade, error) {
+	// Find the latest trade of this stock in the database
+	trades, err := db.FindTrades(code)
 	if err != nil {
 		return nil, err
 	}
-
-	// Then check if we already have some of them in database
-	oldTrades := db.FindTrades(searchParams)
-	fmt.Printf("Found %d trades in db", len(oldTrades))
-
-	// Then save only new data to database
-	for _, trade := range trades {
-		if _, ok := oldTrades[trade.Timestamp]; !ok {
-			_, err := db.InsertTrade(searchParams.Code, trade)
-			if err != nil {
-				return nil, err
-			}
+	fromDate := time.Now().AddDate(-5, 0, 0) // 5 years ago
+	toDate := time.Now().AddDate(0, 0, -1)   // yesterday
+	if len(trades) > 0 {
+		if lastTrade := trades[len(trades)-1]; lastTrade != nil {
+			fromDate = time.Unix(int64(lastTrade.Timestamp)/1000, 0)
 		}
 	}
+	x := toDate.Sub(fromDate)
+	if x.Hours() <= 0 {
+		return trades, nil
+	}
+
+	newTrades, err := scraper.GetTrades(code, fromDate, toDate)
+	if err != nil {
+		return nil, err
+	}
+	if len(newTrades) > 0 {
+		_, err = db.InsertTrades(newTrades)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	trades = append(trades, newTrades...)
 	return trades, nil
 }
-
-// Mutation returns generated.MutationResolver implementation.
-func (r *Resolver) Mutation() generated.MutationResolver { return &mutationResolver{r} }
 
 // Query returns generated.QueryResolver implementation.
 func (r *Resolver) Query() generated.QueryResolver { return &queryResolver{r} }
 
-type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }

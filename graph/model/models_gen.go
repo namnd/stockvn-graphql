@@ -15,11 +15,6 @@ type CompanySearchParams struct {
 	SectorIds []*string `json:"sectorIds"`
 }
 
-type NewTodo struct {
-	Text   string `json:"text"`
-	UserID string `json:"userId"`
-}
-
 type Sector struct {
 	ID           string  `json:"id"`
 	Label        string  `json:"label"`
@@ -27,26 +22,9 @@ type Sector struct {
 	Exchange     string  `json:"exchange"`
 }
 
-type Todo struct {
-	ID   string `json:"id"`
-	Text string `json:"text"`
-	Done bool   `json:"done"`
-	User *User  `json:"user"`
-}
-
 type Trade struct {
-	ClosePrice int `json:"closePrice"`
-	Volume     int `json:"volume"`
-	Timestamp  int `json:"timestamp"`
-}
-
-type TradeSearchParams struct {
-	Code string `json:"code"`
-	From string `json:"from"`
-	To   string `json:"to"`
-}
-
-type User struct {
-	ID   string `json:"id"`
-	Name string `json:"name"`
+	Code       string `json:"code"`
+	ClosePrice int    `json:"closePrice" bson:"close_price"`
+	Volume     int    `json:"volume"`
+	Timestamp  int    `json:"timestamp"`
 }
