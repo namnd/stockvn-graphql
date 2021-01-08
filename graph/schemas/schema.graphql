@@ -18,11 +18,6 @@ input CompanySearchParams {
   exchange: String
   sectorIds: [String]
 }
-type Query {
-  todos: [Todo!]!
-  sectors(exchange: String): [Sector!]!
-  companies(searchParams: CompanySearchParams): [Company!]!
-}
 
 input NewTodo {
   text: String!
@@ -46,4 +41,26 @@ type Company {
   name: String!
   exchange: String!
   sectorId: String!
+}
+
+type Trade {
+  closePrice: Int!
+  volume: Int!
+  timestamp: Int!
+}
+
+scalar Date
+
+input TradeSearchParams {
+  code: String!
+  from: Date!
+  to: Date!
+}
+
+type Query {
+  todos: [Todo!]!
+  sectors(exchange: String): [Sector!]!
+  companies(searchParams: CompanySearchParams): [Company!]!
+  company(exchange: String!, code: String!): Company!
+  trades(searchParams: TradeSearchParams): [Trade!]!
 }

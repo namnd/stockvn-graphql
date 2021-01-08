@@ -6,12 +6,11 @@ package graph
 import (
 	"context"
 	"fmt"
-	"log"
 
 	"github.com/namnd/stockvn-graphql/db"
 	"github.com/namnd/stockvn-graphql/graph/generated"
 	"github.com/namnd/stockvn-graphql/graph/model"
-	"go.mongodb.org/mongo-driver/bson"
+	"github.com/namnd/stockvn-graphql/scraper"
 )
 
 func (r *mutationResolver) CreateTodo(ctx context.Context, input model.NewTodo) (*model.Todo, error) {
@@ -23,43 +22,40 @@ func (r *queryResolver) Todos(ctx context.Context) ([]*model.Todo, error) {
 }
 
 func (r *queryResolver) Sectors(ctx context.Context, exchange *string) ([]*model.Sector, error) {
-	var sectors []*model.Sector
-	filter := bson.M{}
-	if exchange != nil && *exchange != "all" {
-		filter = bson.M{"exchange": *exchange}
-	}
-	cursor, err := db.Connect().Sectors.Find(context.TODO(), filter)
-	if err != nil {
-		log.Fatal(err)
-	}
-	if err = cursor.All(ctx, &sectors); err != nil {
-		log.Fatal(err)
-	}
-	return sectors, nil
+	return db.FindSectors(exchange)
 }
 
 func (r *queryResolver) Companies(ctx context.Context, searchParams *model.CompanySearchParams) ([]*model.Company, error) {
-	var companies []*model.Company
-	filter := bson.M{}
-	if exchange := searchParams.Exchange; exchange != nil && *exchange != "all" {
-		filter = bson.M{"exchange": *exchange}
-	}
-	sectorQuery := []bson.M{}
-	if sectorIds := searchParams.SectorIds; sectorIds != nil && len(sectorIds) > 0 {
-		ids := []string{}
-		for _, sectorId := range sectorIds {
-			ids = append(ids, *sectorId)
-		}
-		filter["$and"] = append(sectorQuery, bson.M{"sector_id": bson.M{"$in": ids}})
-	}
-	cursor, err := db.Connect().Companies.Find(context.TODO(), filter)
+	return db.FindCompanies(searchParams)
+}
+
+func (r *queryResolver) Company(ctx context.Context, exchange string, code string) (*model.Company, error) {
+	return db.FindCompany(exchange, code)
+}
+
+func (r *queryResolver) Trades(ctx context.Context, searchParams *model.TradeSearchParams) ([]*model.Trade, error) {
+	// First crawl some data
+	var trades []*model.Trade
+	trades, err := scraper.GetTrades(searchParams)
+	fmt.Printf("Crawl %d trades", len(trades))
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
-	if err = cursor.All(ctx, &companies); err != nil {
-		log.Fatal(err)
+
+	// Then check if we already have some of them in database
+	oldTrades := db.FindTrades(searchParams)
+	fmt.Printf("Found %d trades in db", len(oldTrades))
+
+	// Then save only new data to database
+	for _, trade := range trades {
+		if _, ok := oldTrades[trade.Timestamp]; !ok {
+			_, err := db.InsertTrade(searchParams.Code, trade)
+			if err != nil {
+				return nil, err
+			}
+		}
 	}
-	return companies, nil
+	return trades, nil
 }
 
 // Mutation returns generated.MutationResolver implementation.

@@ -10,9 +10,11 @@ import (
 )
 
 type mongoDB struct {
+	Ctx       context.Context
 	Client    *mongo.Client
-	Companies *mongo.Collection
 	Sectors   *mongo.Collection
+	Companies *mongo.Collection
+	Trades    *mongo.Collection
 }
 
 func Connect() mongoDB {
@@ -31,15 +33,14 @@ func Connect() mongoDB {
 	}
 
 	return mongoDB{
+		Ctx:       ctx,
 		Client:    client,
-		Companies: client.Database("stockvn").Collection("companies"),
 		Sectors:   client.Database("stockvn").Collection("sectors"),
+		Companies: client.Database("stockvn").Collection("companies"),
+		Trades:    client.Database("stockvn").Collection("trades"),
 	}
 }
 
 func (db mongoDB) Disconnect() {
-	err := db.Client.Disconnect(context.Background())
-	if err != nil {
-		log.Fatal(err)
-	}
+	db.Client.Disconnect(db.Ctx)
 }
