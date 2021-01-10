@@ -2,29 +2,53 @@
 
 package model
 
+import (
+	"time"
+)
+
 type Company struct {
-	ID       string `json:"id"`
-	Code     string `json:"code"`
-	Name     string `json:"name"`
-	Exchange string `json:"exchange"`
-	SectorID string `json:"sectorId"`
+	ID       string `json:"id" bson:"id"`
+	Code     string `json:"code" bson:"code"`
+	Name     string `json:"name" bson:"name"`
+	Exchange string `json:"exchange" bson:"exchange"`
+	SectorID string `json:"sectorId" bson:"sectorId"`
 }
 
 type CompanySearchParams struct {
-	Exchange  *string   `json:"exchange"`
-	SectorIds []*string `json:"sectorIds"`
+	Exchange  *string   `json:"exchange" bson:"exchange"`
+	SectorIds []*string `json:"sectorIds" bson:"sectorIds"`
 }
 
 type Sector struct {
-	ID           string  `json:"id"`
-	Label        string  `json:"label"`
-	LabelEnglish *string `json:"label_english"`
-	Exchange     string  `json:"exchange"`
+	ID           string  `json:"id" bson:"id"`
+	Label        string  `json:"label" bson:"label"`
+	LabelEnglish *string `json:"label_english" bson:"label_english"`
+	Exchange     string  `json:"exchange" bson:"exchange"`
 }
 
 type Trade struct {
-	Code       string `json:"code"`
-	ClosePrice int    `json:"closePrice" bson:"close_price"`
-	Volume     int    `json:"volume"`
-	Timestamp  int    `json:"timestamp"`
+	Code                    string    `json:"code" bson:"code"`
+	ClosePrice              int       `json:"closePrice" bson:"closePrice"`
+	Volume                  int       `json:"volume" bson:"volume"`
+	Date                    time.Time `json:"date" bson:"date"`
+	OpenPrice               int       `json:"openPrice" bson:"openPrice"`
+	HighPrice               int       `json:"highPrice" bson:"highPrice"`
+	LowPrice                int       `json:"lowPrice" bson:"lowPrice"`
+	AvgPrice                int       `json:"avgPrice" bson:"avgPrice"`
+	BuyOrder                int       `json:"buyOrder" bson:"buyOrder"`
+	BuyVolume               int       `json:"buyVolume" bson:"buyVolume"`
+	SellOrder               int       `json:"sellOrder" bson:"sellOrder"`
+	SellVolume              int       `json:"sellVolume" bson:"sellVolume"`
+	MatchedVolume           int       `json:"matchedVolume" bson:"matchedVolume"`
+	MatchedValue            int       `json:"matchedValue" bson:"matchedValue"`
+	PutThroughOrder         int       `json:"putThroughOrder" bson:"putThroughOrder"`
+	PutThroughVolume        int       `json:"putThroughVolume" bson:"putThroughVolume"`
+	PutThroughValue         int       `json:"putThroughValue" bson:"putThroughValue"`
+	ForeignRemainVolume     int       `json:"foreignRemainVolume" bson:"foreignRemainVolume"`
+	ForeignBuyVolume        int       `json:"foreignBuyVolume" bson:"foreignBuyVolume"`
+	ForeignBuyValue         int       `json:"foreignBuyValue" bson:"foreignBuyValue"`
+	ForeignSellVolume       int       `json:"foreignSellVolume" bson:"foreignSellVolume"`
+	ForeignSellValue        int       `json:"foreignSellValue" bson:"foreignSellValue"`
+	ForeignPutThroughVolume int       `json:"foreignPutThroughVolume" bson:"foreignPutThroughVolume"`
+	ForeignPutThroughValue  int       `json:"foreignPutThroughValue" bson:"foreignPutThroughValue"`
 }

@@ -18,11 +18,32 @@ type Company {
   sectorId: String!
 }
 
+scalar Time
 type Trade {
   code: String!
   closePrice: Int!
   volume: Int!
-  timestamp: Int!
+  date: Time!
+  openPrice: Int!
+  highPrice: Int!
+  lowPrice: Int!
+  avgPrice: Int!
+  buyOrder: Int!
+  buyVolume: Int!
+  sellOrder: Int!
+  sellVolume: Int!
+  matchedVolume: Int!
+  matchedValue: Int!
+  putThroughOrder: Int!
+  putThroughVolume: Int!
+  putThroughValue: Int!
+  foreignRemainVolume: Int!
+  foreignBuyVolume: Int!
+  foreignBuyValue: Int!
+  foreignSellVolume: Int!
+  foreignSellValue: Int!
+  foreignPutThroughVolume: Int!
+  foreignPutThroughValue: Int!
 }
 
 type Query {
@@ -30,4 +51,7 @@ type Query {
   companies(searchParams: CompanySearchParams): [Company!]!
   company(exchange: String!, code: String!): Company!
   trades(code: String!): [Trade!]!
+  tradeMatching(code: String!): [Trade!]!
+  tradePutThrough(code: String!): [Trade!]!
+  tradeForeign(code: String!): [Trade!]!
 }
